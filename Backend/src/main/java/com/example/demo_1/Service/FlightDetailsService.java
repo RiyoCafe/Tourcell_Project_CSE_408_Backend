@@ -5,15 +5,19 @@ import com.example.demo_1.Entity.FlightOptions;
 import com.example.demo_1.Payload.Request.FlightDetailsRequest;
 import com.example.demo_1.Payload.Request.PackageRequest;
 import com.example.demo_1.Payload.Response.FlightDetailsResponse;
+import com.example.demo_1.Payload.Response.MessageResponse;
 import com.example.demo_1.Repository.FlightOptionsRepository;
 import com.example.demo_1.Repository.FlightRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 public class FlightDetailsService {
     @Autowired
     private FlightRepository flightRepository;
@@ -35,7 +39,7 @@ public class FlightDetailsService {
         response.setDescription(flight.getDescription());
         return response;
     }
-    private Flight createFlight(FlightDetailsRequest flightDetailsRequest, Long packageUuid,Long uuid) {
+    private Flight createFlightOrUpdate(FlightDetailsRequest flightDetailsRequest, Long packageUuid,Long uuid) {
         Flight flight=new Flight();
         if(uuid!=null)  flight.setUuid(uuid);
         flight.setAirlinesNames(flightDetailsRequest.getAirlinesNames());
@@ -48,7 +52,8 @@ public class FlightDetailsService {
         flight.setDescription(flightDetailsRequest.getDescription());
         flight.setChangePrice(flightDetailsRequest.getChangePrice());
         flight.setDescription(flightDetailsRequest.getDescription());
-        return flight;
+        Flight savedFlight=flightRepository.save(flight);
+        return savedFlight;
     }
     public List<FlightDetailsResponse> getFlightDetails(Long packageUuid){
         List<FlightDetailsResponse> responses= new ArrayList<>();
@@ -58,44 +63,81 @@ public class FlightDetailsService {
         }
         return responses;
     }
-
-    public void addFlightAndFlightOptions(PackageRequest packageRequest, Long packageUuid){
-        List<FlightDetailsRequest> flightDetailsRequests = packageRequest.getFlightDetailsRequests();
-        for(FlightDetailsRequest flightDetailsRequest:flightDetailsRequests){
-            Flight flight = createFlight(flightDetailsRequest,packageUuid,null);
-            Flight savedFlight=flightRepository.save(flight);
-            Long flightUuid= savedFlight.getUuid();
-            List<FlightOptions> options= flightDetailsRequest.getOptionsList();
-            for(FlightOptions option:options){
-                option.setFlightUuid(flightUuid);
-                flightOptionsRepository.save(option);
-            }
-        }
+    private void onlyFlightOptionsAddOrUpdate(FlightOptions option,Long flightUuid)
+    {
+        Long flightOptionUuid = option.getUuid();
+        FlightOptions updatedOption = new FlightOptions();
+        if(flightOptionUuid!=null)  updatedOption.setUuid(flightOptionUuid);
+        updatedOption.setChangePrice(option.getChangePrice());
+        updatedOption.setBusinessClass(option.getBusinessClass());
+        updatedOption.setFoodProvided(option.getFoodProvided());
+        updatedOption.setFlightUuid(flightUuid);
+        flightOptionsRepository.save(updatedOption);
     }
+    private FlightDetailsResponse middleWareFunctionAddOrUpdate(FlightDetailsRequest flightDetailsRequest, Long packageUuid,Long FlightUuid)
+    {
+        Flight savedFlight = createFlightOrUpdate(flightDetailsRequest,packageUuid,FlightUuid);
+        Long flightUuid= savedFlight.getUuid();
+        List<FlightOptions> options= flightDetailsRequest.getOptionsList();
+        
+        for(FlightOptions option:options){
+            onlyFlightOptionsAddOrUpdate(option,flightUuid);
+        }
+        FlightDetailsResponse response = makeResponse(savedFlight);
+        return response;
+    }
+    //packageUuid will come from packageController
+//    public void addFlightAndFlightOptions(PackageRequest packageRequest, Long packageUuid){
+//        List<FlightDetailsRequest> flightDetailsRequests = packageRequest.getFlightDetailsRequests();
+//        for(FlightDetailsRequest flightDetailsRequest:flightDetailsRequests){
+//            middleWareFunctionAddOrUpdate(flightDetailsRequest,packageUuid,flightDetailsRequest.getFlightUuid());
+//        }
+//    }
+    //existing package and add a new flight and flightOptions
+//    public void addFlightAndFlightOptionsByPackageUuid(FlightDetailsRequest request,Long packageUuid)
+//    {
+//        middleWareFunctionAddOrUpdate(request,packageUuid, request.getFlightUuid());
+//    }
 
     public String saveFlightAndFlightOptions(PackageRequest packageRequest, Long packageUuid){
         List<FlightDetailsRequest> flightDetailsRequests = packageRequest.getFlightDetailsRequests();
         for(FlightDetailsRequest request:flightDetailsRequests){
-            Long flightUuid = request.getFlightUuid();
-            Flight updatedOrNewFlight;
-            updatedOrNewFlight = createFlight(request,packageUuid,flightUuid);
-            Flight savedFlight = flightRepository.save(updatedOrNewFlight);
-            flightUuid = savedFlight.getUuid();
-            List<FlightOptions> options = request.getOptionsList();
-
-            for(FlightOptions option:options){
-                Long flightOptionUuid = option.getUuid();
-                FlightOptions updatedOption = new FlightOptions();
-                if(flightOptionUuid!=null)  updatedOption.setUuid(flightOptionUuid);
-                updatedOption.setChangePrice(option.getChangePrice());
-                updatedOption.setBusinessClass(option.getBusinessClass());
-                updatedOption.setFoodProvided(option.getFoodProvided());
-                updatedOption.setFlightUuid(flightUuid);
-                flightOptionsRepository.save(updatedOption);
-            }
+            middleWareFunctionAddOrUpdate(request,packageUuid, request.getFlightUuid());
         }
         return  "saved flight and flightOptions";
 
+    }
+    //existing package and update a new flight and flightOptions
+    public FlightDetailsResponse saveFlightAndFlightOptionsByPackageUuid(FlightDetailsRequest request,Long packageUuid,Long flightUuid)
+    {
+        return middleWareFunctionAddOrUpdate(request,packageUuid,flightUuid);
+
+    }
+
+    public FlightDetailsResponse deleteFlightAndFlightOptions(Long flightUuid)
+    {
+        Flight flight = flightRepository.findByUuid(flightUuid);
+        FlightDetailsResponse response = makeResponse(flight);
+        List<FlightOptions> options = flightOptionsRepository.findAllByFlightUuid(flightUuid);
+
+        System.out.println("joya "+options);
+        for(FlightOptions option:options)
+        {
+            flightOptionsRepository.deleteByUuid(option.getUuid());
+        }
+        flightRepository.deleteByUuid(flightUuid);
+
+        return response;
+    }
+    public List<FlightDetailsResponse> deleteFlightAndFlightOptionsByPackageUuid(Long packageUuid)
+    {
+        List<FlightDetailsResponse> responses = new ArrayList<>();
+        List<Flight> flights = flightRepository.findAllByPackageUuid(packageUuid);
+        for(Flight flight:flights)
+        {
+            responses.add(deleteFlightAndFlightOptions(flight.getUuid()));
+        }
+        return responses;
     }
 
 

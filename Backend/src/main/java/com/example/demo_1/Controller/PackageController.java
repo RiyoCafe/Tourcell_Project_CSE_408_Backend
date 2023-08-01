@@ -1,6 +1,8 @@
 package com.example.demo_1.Controller;
 
+import com.example.demo_1.Entity.HotelPackage;
 import com.example.demo_1.Entity.Package;
+import com.example.demo_1.Payload.Request.PackageFilterRequest;
 import com.example.demo_1.Payload.Request.PackageRequest;
 import com.example.demo_1.Payload.Response.MessageResponse;
 import com.example.demo_1.Payload.Response.PackageDetailsResponse;
@@ -8,7 +10,9 @@ import com.example.demo_1.Repository.LocationRepository;
 import com.example.demo_1.Repository.PackageRepository;
 import com.example.demo_1.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +35,7 @@ public class PackageController {
     private HotelPackageService hotelPackageService;
     @Autowired
     private LocationRepository locationRepository;
+    @PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
     @GetMapping("/api/packages")
     public ResponseEntity<?> getAllpackages()
     {
@@ -42,6 +47,7 @@ public class PackageController {
         }
         return ResponseEntity.ok(responses);
     }
+    @PreAuthorize("hasRole('ROLE_VENDOR')")
     @GetMapping("/api/vendor/packages")
     public ResponseEntity<?> getPackagesOfVendor()
     {
@@ -55,11 +61,13 @@ public class PackageController {
         return ResponseEntity.ok(responses);
 
     }
+    @PreAuthorize("hasRole('ROLE_VENDOR')")
     @GetMapping("/api/vendor/packages/{package_uuid}")
     public ResponseEntity<?> getPackageOverview(@PathVariable Long package_uuid){
         PackageDetailsResponse response = packageService.response(package_uuid);
         return ResponseEntity.ok(response);
     }
+    @PreAuthorize("hasRole('ROLE_VENDOR')")
     @PostMapping("/api/vendor/packages")
     public ResponseEntity<?> addNewPackage(@RequestBody PackageRequest packageRequest){
         Long vendorUuid = userService.getMyUserUuid();
@@ -79,14 +87,16 @@ public class PackageController {
 
         Package savedPackage = repository.save(newPackage);
 
-        flightDetailsService.addFlightAndFlightOptions(packageRequest, savedPackage.getUuid());
-        hotelPackageService.addHotelPackageAndHotelPackageOptions(packageRequest, savedPackage.getUuid());
+        flightDetailsService.saveFlightAndFlightOptions(packageRequest, savedPackage.getUuid());
+        hotelPackageService.saveHotelPackageAndHotelPackageOptions(packageRequest, savedPackage.getUuid());
         activityService.saveActivities(packageRequest, savedPackage.getUuid());
+        PackageDetailsResponse response = packageService.response(savedPackage.getUuid());
 
 
-        return ResponseEntity.ok(new MessageResponse("Package Added Successfully"));
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
 
     }
+    @PreAuthorize("hasRole('ROLE_VENDOR')")
     @PutMapping("/api/vendor/packages/{package_uuid}")
     public ResponseEntity<?> updatePackage(@RequestBody PackageRequest packageRequest,@PathVariable Long package_uuid){
         Package updatePackage = repository.findByUuid(package_uuid);
@@ -97,17 +107,24 @@ public class PackageController {
         updatePackage.setOverview(packageRequest.getDescriptionPackage());
         updatePackage.setVendorUuid(updatePackage.getVendorUuid());
         repository.save(updatePackage);
-
-        String response1 = flightDetailsService.saveFlightAndFlightOptions(packageRequest,package_uuid);
-        String response2 = hotelPackageService.saveHotelPackageAndHotelPackageOptions(packageRequest,package_uuid);
+        flightDetailsService.saveFlightAndFlightOptions(packageRequest,package_uuid);
+        hotelPackageService.saveHotelPackageAndHotelPackageOptions(packageRequest,package_uuid);
         activityService.saveActivities(packageRequest,package_uuid);
-        return ResponseEntity.ok(new MessageResponse(response1+" "+response2));
+        PackageDetailsResponse response = packageService.response(package_uuid);
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
-
+    @PreAuthorize("hasRole('ROLE_VENDOR')")
     @DeleteMapping("/api/vendor/packages/{package_uuid}")
     public ResponseEntity<?> deletePackage(@PathVariable Long package_uuid)
     {
-        return ResponseEntity.ok(new MessageResponse("Deleted Package Successfully"));
+        return new ResponseEntity<>(packageService.deletePackage(package_uuid),HttpStatus.OK);
+    }
+    @PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
+    @PostMapping("/api/packages/location/{location_uuid}")
+    public ResponseEntity<?> getPackagesByLocation(@RequestBody PackageFilterRequest request,@PathVariable Long location_uuid)
+    {
+        List<PackageDetailsResponse> responses = packageService.packagesWithFilter(request,location_uuid);
+        return ResponseEntity.ok(responses);
     }
 
 }

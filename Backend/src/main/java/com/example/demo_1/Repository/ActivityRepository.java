@@ -15,7 +15,5 @@ public interface ActivityRepository extends JpaRepository<Activity,Long> {
     @Query("select distinct placeName from Activity where locationUuid=?1")
     List<String> findPlacesByLocationUuid(Long locationUuid);
 
-//    List<Activity> findByReserved_countGreaterThan(int reserved_cnt);
-//    Activity findByLocation_uuid(Long location_uuid);
-//    List<Activity> findByPackage_uuid(Long package_uuid);
+    List<Activity> findAllByPackageUuidIn(List<Long> package_uuids);
 }

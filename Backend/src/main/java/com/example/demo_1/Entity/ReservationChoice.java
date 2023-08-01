@@ -1,6 +1,5 @@
 package com.example.demo_1.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -12,14 +11,14 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@Table(name = "reservation")
-public class Reservation {
+@Table(name = "reservation_choice")
+public class ReservationChoice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long uuid;
-    Long customerUuid;
-    Long packageUuid;
-    int totalCost;
-    @JsonIgnore
-    Double reviewRating;
+    Long reservationUuid;
+    Long choiceUuid;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    ChoiceType choiceType;
 }

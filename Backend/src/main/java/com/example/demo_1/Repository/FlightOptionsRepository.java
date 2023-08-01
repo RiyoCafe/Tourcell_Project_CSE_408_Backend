@@ -8,4 +8,5 @@ import java.util.List;
 public interface FlightOptionsRepository extends JpaRepository<FlightOptions,Long> {
    FlightOptions findByUuid(Long Uuid);
    List<FlightOptions> findAllByFlightUuid(Long flight_uuid);
+   void deleteByUuid(Long uuid);
 }

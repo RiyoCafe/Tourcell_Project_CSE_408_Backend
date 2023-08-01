@@ -1,6 +1,11 @@
 package com.example.demo_1.Controller;
 
 import com.example.demo_1.Entity.Flight;
+import com.example.demo_1.Payload.Request.FlightDetailsRequest;
+import com.example.demo_1.Payload.Response.FlightDetailsResponse;
+import com.example.demo_1.Payload.Response.MessageResponse;
+import com.example.demo_1.Service.FlightDetailsService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import com.example.demo_1.Repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,41 +19,34 @@ import java.util.List;
 public class FlightController {
     @Autowired
     private FlightRepository repository;
-    @GetMapping("/api/flights")
-    public ResponseEntity<List<Flight>> getAllFlights()
-    {
-        return new ResponseEntity<>(repository.findAll(),HttpStatus.OK);
-    }
-    @GetMapping("/api/flights/{package_uuid}")
+    @Autowired
+    private FlightDetailsService flightDetailsService;
+
+    @GetMapping("/api/package/{package_uuid}/flights")
     public ResponseEntity<?> getAllFlights(@PathVariable Long package_uuid)
     {
-        return new ResponseEntity<>(repository.findAllByPackageUuid(package_uuid),HttpStatus.OK);
+        List<FlightDetailsResponse> responses = flightDetailsService.getFlightDetails(package_uuid);
+        return ResponseEntity.ok(responses);
     }
-    @PostMapping("/api/flights")
-    public ResponseEntity<Flight>   addFlight(@RequestBody Flight flight){
-        Flight newFlight=repository.save(flight);
-        return new ResponseEntity<>(newFlight,HttpStatus.CREATED);
+    @PreAuthorize("hasRole('ROLE_VENDOR')")
+    @PostMapping("/api/vendor/flights/{package_uuid}")
+    public ResponseEntity<?> addFlight(@RequestBody FlightDetailsRequest request, @PathVariable Long package_uuid){
+        FlightDetailsResponse response = flightDetailsService.saveFlightAndFlightOptionsByPackageUuid(request, package_uuid,request.getFlightUuid());
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
-    @PutMapping("/api/flights/{flight_uuid}")
-    public ResponseEntity<Flight> updateFlight(@PathVariable Long flight_uuid,@RequestBody Flight flight)
+    @PreAuthorize("hasRole('ROLE_VENDOR')")
+    @PutMapping("/api/vendor/package/{package_uuid}/flights/{flight_uuid}")
+    public ResponseEntity<?> updateFlight(@PathVariable Long flight_uuid,@RequestBody FlightDetailsRequest request,@PathVariable Long package_uuid)
     {
-        Flight updatedFlight=repository.findByUuid(flight_uuid);
-        updatedFlight.setDescription(flight.getDescription());
-        updatedFlight.setChangePrice(flight.getChangePrice());
-        updatedFlight.setAirlinesNames(flight.getAirlinesNames());
-        updatedFlight.setImageUrl(flight.getImageUrl());
-        updatedFlight.setDurationMinutes(flight.getDurationMinutes());
-        updatedFlight.setStartLocationUuid(flight.getStartLocationUuid());
-        updatedFlight.setEndLocationUuid(flight.getEndLocationUuid());
-        updatedFlight.setStartTimestamp(flight.getStartTimestamp());
-        return new ResponseEntity<>(repository.save(updatedFlight),HttpStatus.OK);
+        FlightDetailsResponse response = flightDetailsService.saveFlightAndFlightOptionsByPackageUuid(request,package_uuid,flight_uuid);
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
-    @DeleteMapping("/api/flights/{flight_uuid}")
-    public ResponseEntity<Flight> deleteFlight(@PathVariable Long flight_uuid)
+    @PreAuthorize("hasRole('ROLE_VENDOR')")
+    @DeleteMapping("/api/vendor/flights/{flight_uuid}")
+    public ResponseEntity<?> deleteFlight(@PathVariable Long flight_uuid)
     {
-        Flight deletedFlight = repository.findByUuid(flight_uuid);
-        repository.deleteByUuid(flight_uuid);
-        return new ResponseEntity<>(deletedFlight,HttpStatus.OK);
+        FlightDetailsResponse response = flightDetailsService.deleteFlightAndFlightOptions(flight_uuid);
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
 }
