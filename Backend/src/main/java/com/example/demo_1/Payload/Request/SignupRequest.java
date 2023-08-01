@@ -1,6 +1,5 @@
 package com.example.demo_1.Payload.Request;
 
-import com.example.demo_1.Entity.ERole;
 import lombok.*;
 
 import java.util.Set;

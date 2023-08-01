@@ -1,20 +1,21 @@
 package com.example.demo_1.Service;
 
-import com.example.demo_1.Entity.Activity;
-import com.example.demo_1.Entity.Location;
+import com.example.demo_1.Entity.*;
 import com.example.demo_1.Entity.Package;
-import com.example.demo_1.Entity.User;
+import com.example.demo_1.Payload.Request.PackageFilterRequest;
+import com.example.demo_1.Payload.Request.PackageRequest;
+import com.example.demo_1.Payload.Response.MessageResponse;
 import com.example.demo_1.Payload.Response.PackageDetailsResponse;
-import com.example.demo_1.Repository.ActivityRepository;
-import com.example.demo_1.Repository.LocationRepository;
-import com.example.demo_1.Repository.PackageRepository;
-import com.example.demo_1.Repository.UserRepository;
+import com.example.demo_1.Repository.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
+@Transactional
 public class PackageService {
     @Autowired
     private LocationRepository locationRepository;
@@ -28,6 +29,8 @@ public class PackageService {
     private HotelPackageService hotelPackageService;
     @Autowired
     private FlightDetailsService flightDetailsService;
+    @Autowired
+    private ActivityService activityService;
 
 
     public PackageDetailsResponse response(Long package_uuid)
@@ -41,6 +44,165 @@ public class PackageService {
                 vendor.getFirstname()+" "+vendor.getLastname(),
                 hotelPackageService.getHotelPackageDetails(package_uuid),
                 flightDetailsService.getFlightDetails(package_uuid),activities);
+    }
+
+    public PackageDetailsResponse deletePackage(Long packageUuid)
+    {
+        PackageDetailsResponse response = response(packageUuid);
+        hotelPackageService.deleteHotelPackageByPackageUuid(packageUuid);
+        flightDetailsService.deleteFlightAndFlightOptionsByPackageUuid(packageUuid);
+        activityService.deleteActivityByPackageUuid(packageUuid);
+        packageRepository.deleteByUuid(packageUuid);
+        return response;
+    }
+
+
+    public List<Package> applyPriceFilter(List<Package> packageList, int priceMin, int priceMax)
+    {
+        List<Package> packages = new ArrayList<>();
+        for(Package pack:packageList)
+        {
+            if(pack.getPrice()>=priceMin && pack.getPrice()<=priceMax)
+                packages.add(pack);
+        }
+        return packages;
+    }
+    public List<Package> applyDurationFilter(List<Package> packageList, int durationMin, int durationMax)
+    {
+        List<Package> packages = new ArrayList<>();
+        for(Package pack:packageList)
+        {
+            if(pack.getDurationDays()>=durationMin && pack.getDurationDays()<=durationMax)
+                packages.add(pack);
+        }
+        return packages;
+    }
+    public List<Package> applyHotelStarMinFilter(List<Package> packageList,int star)
+    {
+        List<Package> packages = new ArrayList<>();
+        for(Package pack:packageList)
+        {
+            if(pack.getHotelMinRating()>=star)  packages.add(pack);
+        }
+        return packages;
+    }
+
+    public List<Package> applyPackageRatingFilter(List<Package> packageList,Double package_rating)
+    {
+        List<Package> packages = new ArrayList<>();
+        for(Package pack:packageList)
+        {
+            if(pack.getRating()>=package_rating)  packages.add(pack);
+        }
+        return packages;
+    }
+    public List<Package> applyActivityTags(List<Package> packageList,List<String> activityTags)
+    {
+       List<Package> packages = new ArrayList<>();
+       for(Package pack:packageList)
+       {
+           List<Activity> activities = activityRepository.findAllByPackageUuid(pack.getUuid());
+           boolean foundAll = true;
+           for(String tags:activityTags)
+           {
+               boolean found = false;
+               for(Activity activity:activities)
+               {
+                   if(activity.getName().toLowerCase().contains(tags.toLowerCase())){
+                       found = true;
+                       break;
+                   }
+               }
+               if(found == false)   foundAll=false;
+           }
+           if(foundAll)     packages.add(pack);
+       }
+       return packages;
+
+    }
+    public List<Package> applyActivityPlaces(List<Package> packageList,List<String> activityPlaceName){
+        List<Package> packages = new ArrayList<>();
+        for(Package pack:packageList){
+            List<Activity> activities = activityRepository.findAllByPackageUuid(pack.getUuid());
+            boolean foundAll = true;
+            for(String placeName:activityPlaceName){
+                boolean found = false;
+                for(Activity activity:activities){
+                    if(activity.getName().toLowerCase()==placeName.toLowerCase()){
+                        found=true;
+                        break;
+                    }
+                }
+                if(found == false)  foundAll=false;
+            }
+            if(foundAll)    packages.add(pack);
+        }
+        return packages;
+    }
+
+    private int compareTo(Double value)
+    {
+        if(value<0) return -1;
+        if(value>0) return 1;
+        return 0;
+    }
+    public List<Package> applySortByPrice(List<Package>packages)
+    {
+        Collections.sort(packages, new Comparator<Package>() {
+            @Override
+            public int compare(Package t1, Package t2) {
+                return compareTo((t1.getPrice()-t2.getPrice())*1.0);
+            }
+        });
+        return packages;
+    }
+    public List<Package> applySortByTopReviwed(List<Package> packages)
+    {
+        Collections.sort(packages, new Comparator<Package>() {
+            @Override
+            public int compare(Package t1, Package t2) {
+                return compareTo(t2.getRating()-t1.getRating());
+            }
+        });
+        return packages;
+    }
+    public List<PackageDetailsResponse> packagesWithFilter(PackageFilterRequest request,Long locationUuid)
+    {
+        List<Package> packageList = packageRepository.findAllByLoactionUuidAndStartTimestampAfter(locationUuid,request.getStartTimestamp());
+        if(request.getDurationMax()!=0){
+            packageList = applyDurationFilter(packageList,request.getDurationMin(),request.getDurationMax());
+        }
+        if(request.getPriceMax()!=0){
+            packageList = applyPriceFilter(packageList,request.getPriceMin(),request.getPriceMax());
+        }
+        if(request.getHotelStarMin()!=0){
+            packageList = applyHotelStarMinFilter(packageList,request.getHotelStarMin());
+        }
+        if(request.getPackageRating()!=null){
+            packageList = applyPackageRatingFilter(packageList,request.getPackageRating());
+        }
+        if(request.getActivityTags() != null)
+        {
+            packageList = applyActivityTags(packageList,request.getActivityTags());
+        }
+        if(request.getActivityPlaces() != null){
+            packageList = applyActivityPlaces(packageList,request.getActivityPlaces());
+        }
+        List<PackageDetailsResponse> responses = new ArrayList<>();
+        for(Package p:packageList)
+        {
+            User vendor= userRepository.findByUuid(p.getVendorUuid());
+            Location location=locationRepository.findByUuid(p.getLoactionUuid());
+            List<Activity> activities = activityRepository.findAllByPackageUuid(p.getUuid());
+            responses.add(new PackageDetailsResponse(p.getUuid(),p.getName(), location.getCity()+" "+location.getCountry(),
+                    p.getPrice(),p.getDurationDays(),p.getOverview(),p.getRating(),
+                    vendor.getFirstname()+" "+vendor.getLastname(),
+                    hotelPackageService.getHotelPackageDetails(p.getUuid()),
+                    flightDetailsService.getFlightDetails(p.getUuid()),activities));
+        }
+        return responses;
+
+
     }
 
 }

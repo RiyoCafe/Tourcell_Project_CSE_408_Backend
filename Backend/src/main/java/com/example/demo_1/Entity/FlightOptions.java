@@ -17,7 +17,6 @@ public class FlightOptions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long uuid;
-    @JsonIgnore
     Long flightUuid;
     Boolean foodProvided;
     Boolean businessClass;

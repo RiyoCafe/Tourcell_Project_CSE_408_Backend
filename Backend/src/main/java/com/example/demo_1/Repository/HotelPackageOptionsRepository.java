@@ -8,4 +8,5 @@ import java.util.List;
 public interface HotelPackageOptionsRepository extends JpaRepository<HotelPackageOptions,Long> {
     HotelPackageOptions findByUuid(Long uuid);
     List<HotelPackageOptions> findAllByHotelPackageUuid(Long hotelPackageUuid);
+    void deleteByUuid(Long uuid);
 }
