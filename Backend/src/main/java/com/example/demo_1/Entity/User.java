@@ -25,6 +25,9 @@ public class User {
     private String lastname;
     private String email;
     private String password;
+    @Column(length = 32, columnDefinition = "varchar(32) default 'LOCAL'")
+    @Enumerated(value = EnumType.STRING)
+    AuthProvider provider = AuthProvider.LOCAL;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(  name = "user_roles",

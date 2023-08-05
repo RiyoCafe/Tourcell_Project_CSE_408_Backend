@@ -119,12 +119,20 @@ public class PackageController {
     {
         return new ResponseEntity<>(packageService.deletePackage(package_uuid),HttpStatus.OK);
     }
-    @PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
-    @PostMapping("/api/packages/location/{location_uuid}")
+    //all should have get the permission
+    //@PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
+    @PostMapping("/api/public/packages/location/{location_uuid}")
     public ResponseEntity<?> getPackagesByLocation(@RequestBody PackageFilterRequest request,@PathVariable Long location_uuid)
     {
         List<PackageDetailsResponse> responses = packageService.packagesWithFilter(request,location_uuid);
         return ResponseEntity.ok(responses);
     }
+    @GetMapping ("/api/public/packages")
+    public ResponseEntity<?> getPackagesInOrder(@RequestParam String sortBy)
+    {
+        List<PackageDetailsResponse> responses = packageService.getPackagesInOrder(sortBy);
+        return ResponseEntity.ok(responses);
+    }
+
 
 }

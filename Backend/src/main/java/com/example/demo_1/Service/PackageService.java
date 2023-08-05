@@ -3,13 +3,10 @@ package com.example.demo_1.Service;
 import com.example.demo_1.Entity.*;
 import com.example.demo_1.Entity.Package;
 import com.example.demo_1.Payload.Request.PackageFilterRequest;
-import com.example.demo_1.Payload.Request.PackageRequest;
-import com.example.demo_1.Payload.Response.MessageResponse;
 import com.example.demo_1.Payload.Response.PackageDetailsResponse;
 import com.example.demo_1.Repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -156,7 +153,7 @@ public class PackageService {
         });
         return packages;
     }
-    public List<Package> applySortByTopReviwed(List<Package> packages)
+    public List<Package> applySortByRating(List<Package> packages)
     {
         Collections.sort(packages, new Comparator<Package>() {
             @Override
@@ -188,21 +185,52 @@ public class PackageService {
         if(request.getActivityPlaces() != null){
             packageList = applyActivityPlaces(packageList,request.getActivityPlaces());
         }
+        if(request.getSortBy()== "Price")
+        {
+            packageList = applySortByPrice(packageList);
+        }
+        if(request.getSortBy() == "Rating")
+        {
+            packageList = applySortByRating(packageList);
+        }
         List<PackageDetailsResponse> responses = new ArrayList<>();
         for(Package p:packageList)
         {
-            User vendor= userRepository.findByUuid(p.getVendorUuid());
-            Location location=locationRepository.findByUuid(p.getLoactionUuid());
-            List<Activity> activities = activityRepository.findAllByPackageUuid(p.getUuid());
-            responses.add(new PackageDetailsResponse(p.getUuid(),p.getName(), location.getCity()+" "+location.getCountry(),
-                    p.getPrice(),p.getDurationDays(),p.getOverview(),p.getRating(),
-                    vendor.getFirstname()+" "+vendor.getLastname(),
-                    hotelPackageService.getHotelPackageDetails(p.getUuid()),
-                    flightDetailsService.getFlightDetails(p.getUuid()),activities));
+            responses.add(getPackageDetailsResponse(p));
         }
         return responses;
 
 
     }
+    private PackageDetailsResponse getPackageDetailsResponse( Package p)
+    {
+        User vendor= userRepository.findByUuid(p.getVendorUuid());
+        Location location=locationRepository.findByUuid(p.getLoactionUuid());
+        List<Activity> activities = activityRepository.findAllByPackageUuid(p.getUuid());
+        return new PackageDetailsResponse(p.getUuid(),p.getName(), location.getCity()+" "+location.getCountry(),
+                p.getPrice(),p.getDurationDays(),p.getOverview(),p.getRating(),
+                vendor.getFirstname()+" "+vendor.getLastname(),
+                hotelPackageService.getHotelPackageDetails(p.getUuid()),
+                flightDetailsService.getFlightDetails(p.getUuid()),activities);
+    }
 
+    public List<PackageDetailsResponse> getPackagesInOrder(String sortBy) {
+        List<Package> packageList =new ArrayList<>();
+        //System.out.println("sortBy is "+sortBy);
+        if(sortBy.equalsIgnoreCase("Price") ){
+            System.out.println("hello");
+            packageList = packageRepository.findTop5ByOrderByPriceAsc();
+        }
+        if(sortBy.equalsIgnoreCase("Rating"))
+        {
+            packageList = packageRepository.findTop5ByOrderByRatingDesc();
+        }
+        //System.out.println(packageList);
+        List<PackageDetailsResponse> responses=new ArrayList<>();
+        for(Package p: packageList)
+        {
+            responses.add(getPackageDetailsResponse(p));
+        }
+        return responses;
+    }
 }

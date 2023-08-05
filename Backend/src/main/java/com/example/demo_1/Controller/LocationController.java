@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -16,21 +17,26 @@ public class LocationController {
     @Autowired
     private LocationRepository repository;
 
-    @PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER','ROLE_ADMIN')")
-    @GetMapping("/api/locations")
-    public ResponseEntity<List<Location>> getAllLocations()
+//    @PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER','ROLE_ADMIN')")
+    @GetMapping("/api/public/locations")
+    public ResponseEntity<List<Location>> getAllLocations(@RequestParam(required = false) String sortBy)
     {
-        return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
+        List<Location> locations=new ArrayList<>();
+        if(sortBy == null)  locations = repository.findAll();
+        else if(sortBy.equalsIgnoreCase("SearchCnt"))  locations = repository.findTop4ByOrderBySearchCntDesc();
+        else if(sortBy.equalsIgnoreCase( "ReservationCnt"))  locations = repository.findTop4ByOrderByReservationCntDesc();
+
+        return new ResponseEntity<>(locations, HttpStatus.OK);
     }
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/api/locations/{location_uuid}")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/api/public/locations/{location_uuid}")
     public ResponseEntity<Location> getLocationByid(@PathVariable Long location_uuid)
     {
         return new ResponseEntity<>(repository.findByUuid(location_uuid),HttpStatus.OK);
     }
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/api/locations/{location_city}")
-    public ResponseEntity<Location> getLocationByid(@PathVariable String location_city)
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/api/public/locations/{location_city}")
+    public ResponseEntity<Location> getLocationByCity(@PathVariable String location_city)
     {
         return new ResponseEntity<>(repository.findByCity(location_city),HttpStatus.OK);
     }
@@ -58,4 +64,5 @@ public class LocationController {
         repository.deleteByUuid(location_uuid);
         return new ResponseEntity<>(deletedLocation,HttpStatus.OK);
     }
+
 }

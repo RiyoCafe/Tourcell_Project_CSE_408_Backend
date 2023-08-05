@@ -57,6 +57,12 @@ public class ActivityController {
         List<Activity> activities = repository.findAllByLocationUuid(location_uuid);
         return new ResponseEntity<>(activities,HttpStatus.OK );
     }
+    @GetMapping("/api/public/activities")
+    public ResponseEntity<?> getActivitiesSortBy()
+    {
+        List<Activity> activities = repository.findTop4ByOrderByReservedCountDesc();
+        return ResponseEntity.ok(activities);
+    }
 
     
 }
