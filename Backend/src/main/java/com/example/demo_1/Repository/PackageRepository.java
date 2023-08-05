@@ -13,7 +13,13 @@ public interface PackageRepository extends JpaRepository<Package,Long> {
     void deleteByUuid(Long uuid);
     List<Package> findAllByVendorUuid(Long vendor_uuid);
 
+
     List<Package> findAllByLoactionUuidAndStartTimestampAfter(Long locationUuid, Timestamp startTimestamp);
+
+    List<Package> findTop5ByOrderByPriceAsc();
+
+
+    List<Package> findTop5ByOrderByRatingDesc();
 
 
 }
