@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+@CrossOrigin
 public class PackageController {
     @Autowired
     private PackageRepository repository;
@@ -131,6 +132,17 @@ public class PackageController {
     public ResponseEntity<?> getPackagesInOrder(@RequestParam String sortBy)
     {
         List<PackageDetailsResponse> responses = packageService.getPackagesInOrder(sortBy);
+        return ResponseEntity.ok(responses);
+    }
+    @GetMapping("/api/public/allpackages")
+    public ResponseEntity<?> getPublicAllPackages()
+    {
+        List<PackageDetailsResponse> responses=new ArrayList<>();
+        List<Package> packageList = repository.findAll();
+        for (Package p:packageList){
+            PackageDetailsResponse tempResponse = packageService.response(p.getUuid());
+            responses.add(tempResponse);
+        }
         return ResponseEntity.ok(responses);
     }
 
