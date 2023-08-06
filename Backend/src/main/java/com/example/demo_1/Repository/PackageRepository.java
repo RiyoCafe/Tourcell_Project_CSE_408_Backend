@@ -16,10 +16,10 @@ public interface PackageRepository extends JpaRepository<Package,Long> {
 
     List<Package> findAllByLoactionUuidAndStartTimestampAfter(Long locationUuid, Timestamp startTimestamp);
 
-    List<Package> findTop5ByOrderByPriceAsc();
+    List<Package> findTop4ByOrderByPriceAsc();
 
 
-    List<Package> findTop5ByOrderByRatingDesc();
+    List<Package> findTop4ByOrderByRatingDesc();
 
 
 }

@@ -131,9 +131,13 @@ public class ReservationService {
     }
 
     public Reservation addNewReservation(ReservationRequest request) {
+        Long packageUuid = request.getPackageUuid();
+        Package savedPackage=packageRepository.findByUuid(packageUuid);
+        savedPackage.setReservationCnt(savedPackage.getReservationCnt()+1);
+        packageRepository.save(savedPackage);
         Reservation reservation = new Reservation();
         reservation.setCustomerUuid(request.getCustomerUuid());
-        reservation.setPackageUuid(request.getPackageUuid());
+        reservation.setPackageUuid(packageUuid);
         reservation.setTotalCost(request.getTotalCost());
         Reservation savedReservation = reservationRepository.save(reservation);
         List<ReservationChoice> choices = request.getReservationChoices();

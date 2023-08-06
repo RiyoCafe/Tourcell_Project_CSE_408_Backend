@@ -165,6 +165,10 @@ public class PackageService {
     }
     public List<PackageDetailsResponse> packagesWithFilter(PackageFilterRequest request,Long locationUuid)
     {
+        Location searchedLocation = locationRepository.findByUuid(locationUuid);
+        int cnt = searchedLocation.getSearchCnt()+1;
+        searchedLocation.setSearchCnt(cnt);
+        locationRepository.save(searchedLocation);
         List<Package> packageList = packageRepository.findAllByLoactionUuidAndStartTimestampAfter(locationUuid,request.getStartTimestamp());
         if(request.getDurationMax()!=0){
             packageList = applyDurationFilter(packageList,request.getDurationMin(),request.getDurationMax());
@@ -219,11 +223,11 @@ public class PackageService {
         //System.out.println("sortBy is "+sortBy);
         if(sortBy.equalsIgnoreCase("Price") ){
             System.out.println("hello");
-            packageList = packageRepository.findTop5ByOrderByPriceAsc();
+            packageList = packageRepository.findTop4ByOrderByPriceAsc();
         }
         if(sortBy.equalsIgnoreCase("Rating"))
         {
-            packageList = packageRepository.findTop5ByOrderByRatingDesc();
+            packageList = packageRepository.findTop4ByOrderByRatingDesc();
         }
         //System.out.println(packageList);
         List<PackageDetailsResponse> responses=new ArrayList<>();
