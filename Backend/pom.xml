@@ -139,6 +139,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>tourcell-app</finalName>
 	</build>
 
 </project>
