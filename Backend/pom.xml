@@ -139,7 +139,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<finalName>tourcell-app</finalName>
+<!--		<finalName>tourcell-app</finalName>-->
 	</build>
 
 </project>
