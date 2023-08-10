@@ -14,6 +14,11 @@ public class Demo1Application {
 
 		SpringApplication.run(Demo1Application.class, args);
 	}
+	@GetMapping("/api/public/echo")
+	public String hello()
+	{
+		return "Hello";
+	}
 
 
 }
