@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@CrossOrigin
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class UserController {
     @Autowired
     private UserRepository repository;

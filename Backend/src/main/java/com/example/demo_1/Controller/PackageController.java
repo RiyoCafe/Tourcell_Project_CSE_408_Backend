@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@CrossOrigin
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class PackageController {
     @Autowired
     private PackageRepository repository;
