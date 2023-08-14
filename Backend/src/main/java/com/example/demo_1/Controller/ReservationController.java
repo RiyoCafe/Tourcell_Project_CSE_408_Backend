@@ -22,7 +22,7 @@ import java.util.List;
 
 @Controller
 @Transactional
-@CrossOrigin
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class ReservationController {
     @Autowired
     private ReservationRepository reservationRepository;

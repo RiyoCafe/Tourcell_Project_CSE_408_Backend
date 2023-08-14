@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@CrossOrigin
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class LocationController {
     @Autowired
     private LocationRepository repository;
