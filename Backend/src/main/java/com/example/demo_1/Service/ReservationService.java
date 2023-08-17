@@ -9,6 +9,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,9 @@ public class ReservationService {
     private UserRepository userRepository;
     @Autowired
     private HotelRepository hotelRepository;
+
+    @Autowired
+    private NotificationService notificationService;
     public ReservationResponse makeSingleReservationResponse(Reservation reservation,Long customerUuid)
     {
         Long packageUuid = reservation.getPackageUuid();
@@ -139,7 +144,13 @@ public class ReservationService {
         reservation.setCustomerUuid(request.getCustomerUuid());
         reservation.setPackageUuid(packageUuid);
         reservation.setTotalCost(request.getTotalCost());
+        reservation.setTimestamp(Timestamp.from(Instant.now()));
         Reservation savedReservation = reservationRepository.save(reservation);
+
+        User vendor = userRepository.findByUuid(savedPackage.getVendorUuid());
+
+        notificationService.makeNotification(request.getCustomerUuid(), vendor.getUuid(), NotificationType.BOOKING, savedPackage.getName());
+
         List<ReservationChoice> choices = request.getReservationChoices();
         List<ReservationChoice> responseChoices = new ArrayList<>();
         for(ReservationChoice choice:choices) {

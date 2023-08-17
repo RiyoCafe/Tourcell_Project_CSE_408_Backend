@@ -1,8 +1,11 @@
 package com.example.demo_1.Controller;
 
 import com.example.demo_1.Entity.Message;
+import com.example.demo_1.Entity.Notification;
+import com.example.demo_1.Entity.NotificationType;
 import com.example.demo_1.Repository.MessageRepository;
 import com.example.demo_1.Service.MessageService;
+import com.example.demo_1.Service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -26,6 +29,8 @@ public class MessageController {
     private MessageRepository messageRepository;
     @Autowired
     private MessageService messageService;
+    @Autowired
+    private NotificationService notificationService;
 
     //receive message in this method
     @MessageMapping("/message") //  /app/message(whenever user need to send message through web socket)
@@ -35,6 +40,9 @@ public class MessageController {
         message.setReceiverUuid(0L);
         message.setTimestamp(Timestamp.from(Instant.now()));
         messageRepository.save(message);
+        notificationService.makeNotification(message.getSenderUuid(), message.getReceiverUuid(),NotificationType.MESSAGE,null);
+
+
         return message;
     }
 
@@ -43,6 +51,9 @@ public class MessageController {
     {
         message.setTimestamp(Timestamp.from(Instant.now()));
         messageRepository.save(message);
+
+        notificationService.makeNotification(message.getSenderUuid(), message.getReceiverUuid(),NotificationType.MESSAGE,null);
+
         simpMessagingTemplate.convertAndSendToUser(String.valueOf(message.getReceiverUuid()),"/private",message);//user/userID/private
         return message;
     }
