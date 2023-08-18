@@ -20,8 +20,8 @@ public class ActivityController {
     private ActivityRepository repository;
     @Autowired
     private ActivityService activityService;
-    //@PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
-    @GetMapping("/api/public/activities")
+    @PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
+    @GetMapping("/api/activities")
     public ResponseEntity<List<Activity>> getAllActivities()
     {
         return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
