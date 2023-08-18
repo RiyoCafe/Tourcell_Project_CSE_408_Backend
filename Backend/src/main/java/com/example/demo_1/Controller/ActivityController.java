@@ -20,14 +20,14 @@ public class ActivityController {
     private ActivityRepository repository;
     @Autowired
     private ActivityService activityService;
-    @PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
-    @GetMapping("/api/activities")
+    //@PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
+    @GetMapping("/api/public/activities")
     public ResponseEntity<List<Activity>> getAllActivities()
     {
         return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
     }
-    @PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
-    @GetMapping("/api/activities/{activity_uuid}")
+    //@PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
+    @GetMapping("/api/public/activities/{activity_uuid}")
     public ResponseEntity<?> getActivityByid(@PathVariable Long activity_uuid)
     {
         return new ResponseEntity<>(repository.findByUuid(activity_uuid), HttpStatus.OK);
@@ -52,8 +52,8 @@ public class ActivityController {
         Activity deletedActivity = activityService.deleteActivity(activity_uuid);
         return new ResponseEntity<>(deletedActivity,HttpStatus.OK);
     }
-    @PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
-    @GetMapping("/api/activities/location/{location_uuid}")
+    //@PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
+    @GetMapping("/api/public/activities/location/{location_uuid}")
     public ResponseEntity<?> getActivityTagsByCity(@PathVariable Long location_uuid){
         List<Activity> activities = repository.findAllByLocationUuid(location_uuid);
         return new ResponseEntity<>(activities,HttpStatus.OK );
