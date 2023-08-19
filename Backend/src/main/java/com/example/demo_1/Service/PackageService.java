@@ -105,7 +105,7 @@ public class PackageService {
                boolean found = false;
                for(Activity activity:activities)
                {
-                   if(activity.getName().toLowerCase().contains(tags.toLowerCase())){
+                   if(activity.getName().equalsIgnoreCase(tags)){
                        found = true;
                        break;
                    }
@@ -125,7 +125,7 @@ public class PackageService {
             for(String placeName:activityPlaceName){
                 boolean found = false;
                 for(Activity activity:activities){
-                    if(activity.getName().equalsIgnoreCase(placeName)){
+                    if(activity.getPlaceName().equalsIgnoreCase(placeName)){
                         found=true;
                         break;
                     }
@@ -165,27 +165,34 @@ public class PackageService {
     }
     public List<PackageDetailsResponse> packagesWithFilter(PackageFilterRequest request,Long locationUuid)
     {
+        System.out.println("request "+request);
         Location searchedLocation = locationRepository.findByUuid(locationUuid);
         int cnt = searchedLocation.getSearchCnt()+1;
         searchedLocation.setSearchCnt(cnt);
         locationRepository.save(searchedLocation);
         List<Package> packageList = packageRepository.findAllByLoactionUuidAndStartTimestampAfter(locationUuid,request.getStartTimestamp());
+
         if(request.getDurationMax()!=0){
             packageList = applyDurationFilter(packageList,request.getDurationMin(),request.getDurationMax());
         }
+
         if(request.getPriceMax()!=0){
             packageList = applyPriceFilter(packageList,request.getPriceMin(),request.getPriceMax());
         }
+
         if(request.getHotelStarMin()!=0){
             packageList = applyHotelStarMinFilter(packageList,request.getHotelStarMin());
         }
+
         if(request.getPackageRating()!=null){
             packageList = applyPackageRatingFilter(packageList,request.getPackageRating());
         }
+
         if(request.getActivityTags() != null)
         {
             packageList = applyActivityTags(packageList,request.getActivityTags());
         }
+
         if(request.getActivityPlaces() != null){
             packageList = applyActivityPlaces(packageList,request.getActivityPlaces());
         }
