@@ -125,7 +125,7 @@ public class PackageService {
             for(String placeName:activityPlaceName){
                 boolean found = false;
                 for(Activity activity:activities){
-                    if(activity.getName().toLowerCase()==placeName.toLowerCase()){
+                    if(activity.getName().equalsIgnoreCase(placeName)){
                         found=true;
                         break;
                     }
@@ -189,11 +189,11 @@ public class PackageService {
         if(request.getActivityPlaces() != null){
             packageList = applyActivityPlaces(packageList,request.getActivityPlaces());
         }
-        if(request.getSortBy()== "Price")
+        if(request.getSortBy() .equalsIgnoreCase("Price") )
         {
             packageList = applySortByPrice(packageList);
         }
-        if(request.getSortBy() == "Rating")
+        if(request.getSortBy().equalsIgnoreCase("Rating"))
         {
             packageList = applySortByRating(packageList);
         }
