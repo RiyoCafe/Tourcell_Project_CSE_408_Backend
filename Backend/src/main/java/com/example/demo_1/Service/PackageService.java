@@ -206,8 +206,6 @@ public class PackageService {
             responses.add(getPackageDetailsResponse(p));
         }
         return responses;
-
-
     }
     private PackageDetailsResponse getPackageDetailsResponse( Package p)
     {
