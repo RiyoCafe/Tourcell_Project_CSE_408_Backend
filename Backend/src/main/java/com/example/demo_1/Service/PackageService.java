@@ -189,14 +189,17 @@ public class PackageService {
         if(request.getActivityPlaces() != null){
             packageList = applyActivityPlaces(packageList,request.getActivityPlaces());
         }
-        if(request.getSortBy() .equalsIgnoreCase("Price") )
-        {
-            packageList = applySortByPrice(packageList);
+        if(request.getSortBy()!=null){
+            if(request.getSortBy() .equalsIgnoreCase("Price") )
+            {
+                packageList = applySortByPrice(packageList);
+            }
+            if(request.getSortBy().equalsIgnoreCase("Rating"))
+            {
+                packageList = applySortByRating(packageList);
+            }
         }
-        if(request.getSortBy().equalsIgnoreCase("Rating"))
-        {
-            packageList = applySortByRating(packageList);
-        }
+
         List<PackageDetailsResponse> responses = new ArrayList<>();
         for(Package p:packageList)
         {
