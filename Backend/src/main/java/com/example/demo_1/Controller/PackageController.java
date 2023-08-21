@@ -21,6 +21,7 @@ import java.util.List;
 
 @Controller
 @CrossOrigin(origins = "*", maxAge = 3600)
+
 public class PackageController {
     @Autowired
     private PackageRepository repository;
@@ -36,18 +37,18 @@ public class PackageController {
     private HotelPackageService hotelPackageService;
     @Autowired
     private LocationRepository locationRepository;
-    @PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
-    @GetMapping("/api/packages")
-    public ResponseEntity<?> getAllpackages()
-    {
-        List<PackageDetailsResponse> responses=new ArrayList<>();
-        List<Package> packageList = repository.findAll();
-        for (Package p:packageList){
-            PackageDetailsResponse tempResponse = packageService.response(p.getUuid());
-            responses.add(tempResponse);
-        }
-        return ResponseEntity.ok(responses);
-    }
+//    @PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
+//    @GetMapping("/api/packages")
+//    public ResponseEntity<?> getAllpackages()
+//    {
+//        List<PackageDetailsResponse> responses=new ArrayList<>();
+//        List<Package> packageList = repository.findAll();
+//        for (Package p:packageList){
+//            PackageDetailsResponse tempResponse = packageService.response(p.getUuid());
+//            responses.add(tempResponse);
+//        }
+//        return ResponseEntity.ok(responses);
+//    }
     @PreAuthorize("hasRole('ROLE_VENDOR')")
     @GetMapping("/api/vendor/packages")
     public ResponseEntity<?> getPackagesOfVendor()
@@ -72,6 +73,7 @@ public class PackageController {
     @PostMapping("/api/vendor/packages")
     public ResponseEntity<?> addNewPackage(@RequestBody PackageRequest packageRequest){
         Long vendorUuid = userService.getMyUserUuid();
+        //Long vendorUuid = 1L;
 
         Package newPackage = new Package();
         newPackage.setName(packageRequest.getPackageName());
