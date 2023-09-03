@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.sql.Timestamp;
 
@@ -32,5 +33,6 @@ public class Activity {
     @JsonIgnore
     Long locationUuid;
     String placeName;
-
+    @ColumnDefault("0")
+    int activityPrice;
 }
