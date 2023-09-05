@@ -48,4 +48,8 @@ public class HotelController {
         repository.deleteByUuid(hotel_uuid);
         return new ResponseEntity<>(deltedHotel,HttpStatus.OK);
     }
+    @GetMapping("/api/public/hotels")
+    public ResponseEntity<List<Hotel>> getAllPHotelsPublic() {
+        return new ResponseEntity<>(repository.findAll(),HttpStatus.OK);
+    }
 }
