@@ -37,7 +37,7 @@ public class PackageController {
     private HotelPackageService hotelPackageService;
     @Autowired
     private LocationRepository locationRepository;
-//    @PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
+    //    @PreAuthorize("hasAnyRole('ROLE_VENDOR','ROLE_CUSTOMER')")
 //    @GetMapping("/api/packages")
 //    public ResponseEntity<?> getAllpackages()
 //    {
@@ -74,7 +74,6 @@ public class PackageController {
     public ResponseEntity<?> addNewPackage(@RequestBody PackageRequest packageRequest){
         Long vendorUuid = userService.getMyUserUuid();
         //Long vendorUuid = 1L;
-
         Package newPackage = new Package();
         newPackage.setName(packageRequest.getPackageName());
         newPackage.setLoactionUuid(packageRequest.getLocationUuid());
@@ -88,16 +87,15 @@ public class PackageController {
         newPackage.setReservationCnt(0);
         newPackage.setHotelMinRating(100);
 
+        boolean activityFlag=true;
+
         Package savedPackage = repository.save(newPackage);
-
-        flightDetailsService.saveFlightAndFlightOptions(packageRequest, savedPackage.getUuid());
-        hotelPackageService.saveHotelPackageAndHotelPackageOptions(packageRequest, savedPackage.getUuid());
-        activityService.saveActivities(packageRequest, savedPackage.getUuid());
+        if(packageRequest.getFlightDetailsRequests().size() > 0) flightDetailsService.saveFlightAndFlightOptions(packageRequest, savedPackage.getUuid());
+        if(packageRequest.getHotelPackageDetailsRequests().size() > 0)  hotelPackageService.saveHotelPackageAndHotelPackageOptions(packageRequest, savedPackage.getUuid());
+        activityFlag=activityService.saveActivities(packageRequest, savedPackage.getUuid());
+        if(activityFlag == false)   return ResponseEntity.ok(new MessageResponse("Negetive price or before current time is not allowed"));
         PackageDetailsResponse response = packageService.response(savedPackage.getUuid());
-
-
         return new ResponseEntity<>(response, HttpStatus.CREATED);
-
     }
     @PreAuthorize("hasRole('ROLE_VENDOR')")
     @PutMapping("/api/vendor/packages/{package_uuid}")
