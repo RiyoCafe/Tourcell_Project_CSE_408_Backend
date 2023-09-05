@@ -36,10 +36,10 @@ public class ActivityService {
         }
         updatedActivity.setActivityPrice(activity.getActivityPrice());//newly added
         updatedActivity.setImageUrl(activity.getImageUrl());
-        LocalDateTime localDateTime = activity.getStartTimestamp().toLocalDateTime();
-        if(localDateTime.isBefore(LocalDateTime.now())){
-            return null;
-        }
+//        LocalDateTime localDateTime = activity.getStartTimestamp().toLocalDateTime();
+//        if(localDateTime.isBefore(LocalDateTime.now())){
+//            return null;
+//        }
         updatedActivity.setStartTimestamp(activity.getStartTimestamp());
         updatedActivity.setDurationMinutes(activity.getDurationMinutes());
         updatedActivity.setPackageUuid(pack.getUuid());

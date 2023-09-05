@@ -90,8 +90,8 @@ public class PackageController {
         boolean activityFlag=true;
 
         Package savedPackage = repository.save(newPackage);
-        flightDetailsService.saveFlightAndFlightOptions(packageRequest, savedPackage.getUuid());
-        hotelPackageService.saveHotelPackageAndHotelPackageOptions(packageRequest, savedPackage.getUuid());
+        if(packageRequest.getFlightDetailsRequests().size() > 0) flightDetailsService.saveFlightAndFlightOptions(packageRequest, savedPackage.getUuid());
+        if(packageRequest.getHotelPackageDetailsRequests().size() > 0)  hotelPackageService.saveHotelPackageAndHotelPackageOptions(packageRequest, savedPackage.getUuid());
         activityFlag=activityService.saveActivities(packageRequest, savedPackage.getUuid());
         if(activityFlag == false)   return ResponseEntity.ok(new MessageResponse("Negetive price or before current time is not allowed"));
         PackageDetailsResponse response = packageService.response(savedPackage.getUuid());
