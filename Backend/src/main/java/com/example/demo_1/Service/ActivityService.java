@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,6 +22,7 @@ public class ActivityService {
     @Autowired
     private PackageRepository packageRepository;
 
+
     public Activity singleActivitySave(Activity activity,Long package_uuid)
     {
         Package pack = packageRepository.findByUuid(package_uuid);
@@ -29,7 +31,15 @@ public class ActivityService {
         if(activityUuid!=null)  updatedActivity.setUuid(activityUuid);
         updatedActivity.setName(activity.getName());
         updatedActivity.setDescription(activity.getDescription());
+        if(activity.getActivityPrice()<0) {
+            return null;
+        }
+        updatedActivity.setActivityPrice(activity.getActivityPrice());//newly added
         updatedActivity.setImageUrl(activity.getImageUrl());
+//        LocalDateTime localDateTime = activity.getStartTimestamp().toLocalDateTime();
+//        if(localDateTime.isBefore(LocalDateTime.now())){
+//            return null;
+//        }
         updatedActivity.setStartTimestamp(activity.getStartTimestamp());
         updatedActivity.setDurationMinutes(activity.getDurationMinutes());
         updatedActivity.setPackageUuid(pack.getUuid());
@@ -40,12 +50,17 @@ public class ActivityService {
         return updatedActivity;
     }
 
-    public void saveActivities(PackageRequest request,Long package_uuid)
+    public boolean saveActivities(PackageRequest request,Long package_uuid)
     {
         List<Activity> activities = request.getActivityRequests();
+        Activity returnActivity ;
         for(Activity activity:activities) {
-            singleActivitySave(activity,package_uuid);
+            returnActivity=singleActivitySave(activity,package_uuid);
+            if(returnActivity == null){
+                return false;
+            }
         }
+        return true;
     }
 
     public Activity deleteActivity(Long activityUuid)
