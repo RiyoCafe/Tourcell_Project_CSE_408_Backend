@@ -3,6 +3,7 @@ package com.example.demo_1.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,6 +35,8 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
+    @ColumnDefault("01558680835")
+    private String emergencyContactNo;
 
     public User( String email, String password) {
         this.email=email;

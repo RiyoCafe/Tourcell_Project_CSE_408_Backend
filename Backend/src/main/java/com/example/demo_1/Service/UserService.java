@@ -129,6 +129,6 @@ public class UserService {
         return new JwtResponse(jwt,
                 userDetails.getUuid(),
                 userDetails.getEmail(),
-                roles);
+                roles,userDetails.getEmergencyContactNo());
     }
 }

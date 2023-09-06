@@ -15,4 +15,5 @@ public class SignupRequest {
     String email;
     Set<String> role;
     String password;
+    String emergencyContactNo;
 }

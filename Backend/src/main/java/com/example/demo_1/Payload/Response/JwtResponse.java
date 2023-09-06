@@ -17,5 +17,6 @@ public class JwtResponse {
     Long uuid;
     String email;
     List<String> roles;
+    String emergencyContactNo;
 
 }
