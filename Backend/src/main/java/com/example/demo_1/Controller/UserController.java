@@ -19,19 +19,18 @@ public class UserController {
     private UserRepository repository;
     @Autowired
     private UserService service;
-    @PreAuthorize("hasRole('ROLE_USER')")
-    @GetMapping("/api/users")
+    @GetMapping("/api/public/users")
     public ResponseEntity<List<User>> getAllEmployees()
     {
         return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
     }
-    @PostMapping("/api/users")
+    @PostMapping("/api/public/users")
     public ResponseEntity<User> addUser(@RequestBody User user)
     {
         User newuser=repository.save(user);
         return new ResponseEntity<>(newuser,HttpStatus.CREATED);
     }
-    @PutMapping("api/user")
+    @PutMapping("api/public/user")
     public ResponseEntity<User> updateUser( @RequestBody User user)
     {
         Long user_uuid=service.getMyUserUuid();
@@ -40,9 +39,10 @@ public class UserController {
         updatedUser.setLastname(user.getLastname());
         updatedUser.setEmail(user.getEmail());
         updatedUser.setPassword(user.getPassword());
+        updatedUser.setEmergencyContactNo(user.getEmergencyContactNo());
         return new ResponseEntity<>(repository.save(updatedUser),HttpStatus.OK);
     }
-    
+
 
 
 }
