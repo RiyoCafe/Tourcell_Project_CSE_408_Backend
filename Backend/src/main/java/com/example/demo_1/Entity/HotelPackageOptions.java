@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
 
 @Data
 @Entity
@@ -19,8 +20,28 @@ public class HotelPackageOptions {
     Long uuid;
 
     Long hotelPackageUuid;
+    @ColumnDefault("false")
     Boolean breakfastProvided;
+    @ColumnDefault("false")
     Boolean airConditioned;
+    @ColumnDefault("false")
+    Boolean lunchProvided;
+    @ColumnDefault("false")
+    Boolean swimmingPoolProvided;
+    @ColumnDefault("false")
+    Boolean FreeWifiProvided;
+    @ColumnDefault("false")
+    Boolean parkingProvided;
+    @ColumnDefault("false")
+    Boolean massageProvided;
+    @ColumnDefault("false")
+    Boolean roomCleanProvided;
+    @ColumnDefault("false")
+    Boolean fitnessCenterProvided;
+    @ColumnDefault("false")
+    Boolean BarProvided;
+    @ColumnDefault("false")
+    Boolean laundryProvided;
     int changePrice;
 
 }
