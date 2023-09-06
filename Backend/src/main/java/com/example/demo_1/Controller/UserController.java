@@ -6,6 +6,7 @@ import com.example.demo_1.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,18 +19,18 @@ public class UserController {
     private UserRepository repository;
     @Autowired
     private UserService service;
-    @GetMapping("/api/users")
+    @GetMapping("/api/public/users")
     public ResponseEntity<List<User>> getAllEmployees()
     {
         return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
     }
-    @PostMapping("/api/users")
+    @PostMapping("/api/public/users")
     public ResponseEntity<User> addUser(@RequestBody User user)
     {
         User newuser=repository.save(user);
         return new ResponseEntity<>(newuser,HttpStatus.CREATED);
     }
-    @PutMapping("api/user")
+    @PutMapping("api/public/user")
     public ResponseEntity<User> updateUser( @RequestBody User user)
     {
         Long user_uuid=service.getMyUserUuid();
@@ -38,8 +39,10 @@ public class UserController {
         updatedUser.setLastname(user.getLastname());
         updatedUser.setEmail(user.getEmail());
         updatedUser.setPassword(user.getPassword());
+        updatedUser.setEmergencyContactNo(user.getEmergencyContactNo());
         return new ResponseEntity<>(repository.save(updatedUser),HttpStatus.OK);
     }
+
 
 
 }

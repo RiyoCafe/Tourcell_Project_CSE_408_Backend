@@ -63,6 +63,7 @@ public class AuthController {
         Set<Role> roles =userService.getUserRoles(strRoles);
 
         user.setRoles(roles);
+        user.setEmergencyContactNo(signUpRequest.getEmergencyContactNo());
         userRepository.save(user);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
