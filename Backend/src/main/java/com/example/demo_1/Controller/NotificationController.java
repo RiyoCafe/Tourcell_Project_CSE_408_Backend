@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping("api/vendor/notification")
+@RequestMapping("api/public/notification")
 @Slf4j
 public class NotificationController {
     @Autowired
