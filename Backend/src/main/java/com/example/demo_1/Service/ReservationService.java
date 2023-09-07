@@ -40,6 +40,8 @@ public class ReservationService {
     private UserRepository userRepository;
     @Autowired
     private HotelRepository hotelRepository;
+    @Autowired
+    private ActivityRepository activityRepository;
 
     @Autowired
     private NotificationService notificationService;
@@ -60,9 +62,13 @@ public class ReservationService {
                 String flightString = getFlightString(choice);
                 choiceStrings.add(flightString);
             }
-            else {
+            else if(choice.getChoiceType() == ChoiceType.HOTEL_PACKAGE_OPTION){
                 String hotelString = getHotelString(choice);
                 choiceStrings.add(hotelString);
+            }
+            else{
+                String activityString = getActivityString(choice);
+                choiceStrings.add(activityString);
             }
         }
         ReservationResponse response = new ReservationResponse();
@@ -119,6 +125,14 @@ public class ReservationService {
             flightString+="Economy Class"+".";
         }
         return flightString;
+    }
+
+    private String getActivityString(ReservationChoice choice){
+        Activity choosenActivity = activityRepository.findByUuid(choice.getChoiceUuid());
+        String activityString = new String();
+        activityString+="intend to do "+choosenActivity.getName()+" activity in "+choosenActivity.getPlaceName()+" for taka "+
+                choosenActivity.getActivityPrice()+" only.";
+        return activityString;
     }
 
     public List<ReservationResponse> makeResponse(Long uuid)

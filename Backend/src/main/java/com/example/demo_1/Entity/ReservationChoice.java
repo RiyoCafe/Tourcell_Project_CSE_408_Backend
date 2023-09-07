@@ -17,7 +17,7 @@ public class ReservationChoice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long uuid;
     Long reservationUuid;
-    Long choiceUuid;
+    Long choiceUuid;//uuid of hotel_package_options/flight_options/activity
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     ChoiceType choiceType;
