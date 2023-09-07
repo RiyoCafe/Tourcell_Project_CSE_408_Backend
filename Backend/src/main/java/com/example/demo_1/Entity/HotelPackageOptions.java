@@ -29,7 +29,7 @@ public class HotelPackageOptions {
     @ColumnDefault("false")
     Boolean swimmingPoolProvided;
     @ColumnDefault("false")
-    Boolean FreeWifiProvided;
+    Boolean freeWifiProvided;
     @ColumnDefault("false")
     Boolean parkingProvided;
     @ColumnDefault("false")
@@ -39,7 +39,7 @@ public class HotelPackageOptions {
     @ColumnDefault("false")
     Boolean fitnessCenterProvided;
     @ColumnDefault("false")
-    Boolean BarProvided;
+    Boolean barProvided;
     @ColumnDefault("false")
     Boolean laundryProvided;
     int changePrice;

@@ -71,8 +71,19 @@ public class HotelPackageService {
         Long hotelPackageOptionUuid = hotelPackageOptions.getUuid();
         HotelPackageOptions updatedOptions = new HotelPackageOptions();
         if(hotelPackageOptionUuid!=null)    updatedOptions.setUuid(hotelPackageOptionUuid);
+
         updatedOptions.setBreakfastProvided(hotelPackageOptions.getBreakfastProvided());
         updatedOptions.setAirConditioned(hotelPackageOptions.getAirConditioned());
+        updatedOptions.setBarProvided(hotelPackageOptions.getBarProvided());
+        updatedOptions.setLunchProvided(hotelPackageOptions.getLunchProvided());
+        updatedOptions.setSwimmingPoolProvided(hotelPackageOptions.getSwimmingPoolProvided());
+        updatedOptions.setFreeWifiProvided(hotelPackageOptions.getFreeWifiProvided());
+        updatedOptions.setParkingProvided(hotelPackageOptions.getParkingProvided());
+        updatedOptions.setMassageProvided(hotelPackageOptions.getMassageProvided());
+        updatedOptions.setRoomCleanProvided(hotelPackageOptions.getRoomCleanProvided());
+        updatedOptions.setFitnessCenterProvided(hotelPackageOptions.getFitnessCenterProvided());
+        updatedOptions.setLaundryProvided(hotelPackageOptions.getLaundryProvided());
+
         updatedOptions.setChangePrice(hotelPackageOptions.getChangePrice());
         updatedOptions.setHotelPackageUuid(hotelPackageUuid);
         HotelPackageOptions updatedHotelPackageOption=hotelPackageOptionsRepository.save(updatedOptions);
