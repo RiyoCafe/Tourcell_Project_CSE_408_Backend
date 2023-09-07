@@ -16,7 +16,7 @@ import java.util.List;
 
 @Controller
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping("api/vendor/push-notifications")
+@RequestMapping("api/public/vendor/push-notifications")
 @Slf4j
 public class PushNotificationController {
     @Autowired

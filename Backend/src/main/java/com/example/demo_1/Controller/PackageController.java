@@ -63,8 +63,8 @@ public class PackageController {
         return ResponseEntity.ok(responses);
 
     }
-    @PreAuthorize("hasRole('ROLE_VENDOR')")
-    @GetMapping("/api/vendor/packages/{package_uuid}")
+   //@PreAuthorize("hasRole('ROLE_VENDOR')")
+    @GetMapping("/api/public/packages/{package_uuid}")
     public ResponseEntity<?> getPackageOverview(@PathVariable Long package_uuid){
         PackageDetailsResponse response = packageService.response(package_uuid);
         return ResponseEntity.ok(response);
