@@ -159,6 +159,8 @@ public class ReservationService {
         reservation.setPackageUuid(packageUuid);
         reservation.setTotalCost(request.getTotalCost());
         reservation.setTimestamp(Timestamp.from(Instant.now()));
+        reservation.setVendorUuid(savedPackage.getVendorUuid());
+
         Reservation savedReservation = reservationRepository.save(reservation);
 
         User vendor = userRepository.findByUuid(savedPackage.getVendorUuid());

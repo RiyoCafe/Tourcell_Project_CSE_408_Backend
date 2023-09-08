@@ -8,13 +8,16 @@ import com.example.demo_1.Repository.*;
 import com.example.demo_1.Service.ReservationService;
 import com.example.demo_1.Service.UserService;
 import jakarta.transaction.Transactional;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,18 +51,54 @@ public class ReservationController {
     }
 
     @PreAuthorize("hasRole('ROLE_VENDOR')")
-    @GetMapping("api/vendor/past-reservations")
-    public ResponseEntity<?> getAllPrevReservations(@RequestParam Timestamp timestamp)
+    @GetMapping("/api/vendor/past-reservations")
+    public ResponseEntity<?> getAllPrevReservationsOfVendor()
     {
-        List<Reservation> pastReservations = reservationRepository.findAllByTimestampBefore(timestamp);
-        return ResponseEntity.ok(pastReservations);
+        Long vendorUuid = userService.getMyUserUuid();
+        List<Reservation> pastReservations = reservationRepository.findAllByTimestampBeforeAndVendorUuid(Timestamp.from(Instant.now()),vendorUuid);
+        List<ReservationResponse> reservationResponses = new ArrayList<>();
+        for (Reservation reservation:pastReservations){
+            reservationResponses.add(reservationService.makeSingleReservationResponse(reservation, reservation.getCustomerUuid()));
+        }
+        return ResponseEntity.ok(reservationResponses);
     }
 
     @PreAuthorize("hasRole('ROLE_VENDOR')")
-    @GetMapping("api/vendor/upcoming-reservations")
-    public ResponseEntity<?> getAllUpcomingReservations(@RequestParam Timestamp timestamp)
+    @GetMapping("/api/vendor/upcoming-reservations")
+    public ResponseEntity<?> getAllUpcomingReservationsOfVendor()
     {
-        List<Reservation> pastReservations = reservationRepository.findAllByTimestampAfter(timestamp);
-        return ResponseEntity.ok(pastReservations);
+        Long vendorUuid = userService.getMyUserUuid();
+        List<Reservation> upcomingReservations = reservationRepository.findAllByTimestampAfterAndVendorUuid(Timestamp.from(Instant.now()),vendorUuid);
+        List<ReservationResponse> reservationResponses = new ArrayList<>();
+        for (Reservation reservation:upcomingReservations){
+            reservationResponses.add(reservationService.makeSingleReservationResponse(reservation, reservation.getCustomerUuid()));
+        }
+        return ResponseEntity.ok(reservationResponses);
     }
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @GetMapping("/api/customer/past-reservations")
+    public ResponseEntity<?> getAllPrevReservationsOfCustomer()
+    {
+        Long customerUuid = userService.getMyUserUuid();
+        List<Reservation> pastReservations = reservationRepository.findAllByTimestampBeforeAndCustomerUuid(Timestamp.from(Instant.now()),customerUuid);
+        List<ReservationResponse> reservationResponses = new ArrayList<>();
+        for (Reservation reservation:pastReservations){
+            reservationResponses.add(reservationService.makeSingleReservationResponse(reservation, reservation.getCustomerUuid()));
+        }
+        return ResponseEntity.ok(reservationResponses);
+    }
+
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @GetMapping("/api/customer/upcoming-reservations")
+    public ResponseEntity<?> getAllUpcomingReservationsOfCustomer()
+    {
+        Long customerUuid = userService.getMyUserUuid();
+        List<Reservation> pastReservations = reservationRepository.findAllByTimestampAfterAndCustomerUuid(Timestamp.from(Instant.now()),customerUuid);
+        List<ReservationResponse> reservationResponses = new ArrayList<>();
+        for (Reservation reservation:pastReservations){
+            reservationResponses.add(reservationService.makeSingleReservationResponse(reservation, reservation.getCustomerUuid()));
+        }
+        return ResponseEntity.ok(reservationResponses);
+    }
+
 }
