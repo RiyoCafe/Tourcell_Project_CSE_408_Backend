@@ -20,7 +20,7 @@ import java.util.Set;
 })
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long uuid;
     private String firstname;
     private String lastname;

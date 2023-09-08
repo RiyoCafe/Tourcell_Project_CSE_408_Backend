@@ -15,7 +15,7 @@ import lombok.ToString;
 @Table(name = "flight_options")
 public class FlightOptions {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long uuid;
     Long flightUuid;
     Boolean foodProvided;

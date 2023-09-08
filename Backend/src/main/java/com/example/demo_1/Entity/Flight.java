@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 @Table(name = "flight")
 public class Flight {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long uuid;
     String airlinesNames;
     Long startLocationUuid;

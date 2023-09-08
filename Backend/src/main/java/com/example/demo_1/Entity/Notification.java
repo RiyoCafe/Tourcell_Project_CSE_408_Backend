@@ -14,7 +14,7 @@ import lombok.ToString;
 @Table(name = "notification")
 public class Notification {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long uuid;
     Long fromUuid;
     Long toUuid;
