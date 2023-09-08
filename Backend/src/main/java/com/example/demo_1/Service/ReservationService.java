@@ -3,10 +3,12 @@ package com.example.demo_1.Service;
 import com.example.demo_1.Entity.*;
 import com.example.demo_1.Entity.Package;
 import com.example.demo_1.Payload.Request.ReservationRequest;
+import com.example.demo_1.Payload.Response.DetailsResponseOfParticularReservation;
 import com.example.demo_1.Payload.Response.ReservationResponse;
 import com.example.demo_1.Repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -97,7 +99,34 @@ public class ReservationService {
             hotelString+="Air conditioned room"+",";
         }
         if(options.getBreakfastProvided()){
-            hotelString+="Breakfast"+".";
+            hotelString+="Breakfast"+",";
+        }
+        if(options.getLunchProvided()){
+            hotelString+="Lunch,";
+        }
+        if(options.getSwimmingPoolProvided()){
+            hotelString+="Swimming pool,";
+        }
+        if(options.getFreeWifiProvided()){
+            hotelString+="FreeWifi,";
+        }
+        if(options.getParkingProvided()){
+            hotelString+="Parking,";
+        }
+        if(options.getMassageProvided()){
+            hotelString+="Massage,";
+        }
+        if(options.getRoomCleanProvided()){
+            hotelString+="Room clean,";
+        }
+        if(options.getFitnessCenterProvided()){
+            hotelString+="Fitness Center,";
+        }
+        if(options.getBarProvided()){
+            hotelString+="Bar,";
+        }
+        if(options.getLaundryProvided()){
+            hotelString+="Laundry,";
         }
         return hotelString;
     }
@@ -158,7 +187,8 @@ public class ReservationService {
         reservation.setCustomerUuid(request.getCustomerUuid());
         reservation.setPackageUuid(packageUuid);
         reservation.setTotalCost(request.getTotalCost());
-        reservation.setTimestamp(Timestamp.from(Instant.now()));
+        //reservation.setTimestamp(Timestamp.from(Instant.now()));
+        reservation.setTimestamp(request.getTimestamp());
         reservation.setVendorUuid(savedPackage.getVendorUuid());
 
         Reservation savedReservation = reservationRepository.save(reservation);
@@ -175,5 +205,44 @@ public class ReservationService {
             reservationChoiceRepository.save(choice);
         }
         return savedReservation;
+    }
+
+    public DetailsResponseOfParticularReservation makeDetailsReservationResponse(Long reservationUuid) {
+        Reservation reservation = reservationRepository.findByUuid(reservationUuid);
+        Package pack = packageRepository.findByUuid(reservation.getPackageUuid());
+        User vendor = userRepository.findByUuid(reservation.getVendorUuid());
+        User customer = userRepository.findByUuid(reservation.getCustomerUuid());
+        List<Activity> activities = new ArrayList<>();
+        DetailsResponseOfParticularReservation response = new DetailsResponseOfParticularReservation();
+        response.setTotalCost(reservation.getTotalCost());
+        response.setPackageName(pack.getName());
+        response.setCustomerName(customer.getFirstname() + " " + customer.getLastname());
+        response.setCustomerEmail(customer.getEmail());
+        response.setVendorName(vendor.getFirstname() + " " + vendor.getLastname());
+        response.setVendorEmail(vendor.getEmail());
+        response.setStartTimeOfTour(reservation.getTimestamp());
+
+        List<ReservationChoice> choices = reservationChoiceRepository.findAllByReservationUuid(reservationUuid);
+        for (ReservationChoice reserve : choices) {
+            if (reserve.getChoiceType() == ChoiceType.HOTEL_PACKAGE_OPTION) {
+                HotelPackageOptions hotelPackageOptions = hotelPackageOptionsRepository.findByUuid(reserve.getChoiceUuid());
+                HotelPackage hotelPackage = hotelPackageRepository.findByUuid(hotelPackageOptions.getHotelPackageUuid());
+                Hotel hotel = hotelRepository.findByUuid(hotelPackage.getHotelUuid());
+                response.setHotelName(hotel.getName());
+                response.setHotelPackageOptions(hotelPackageOptions);
+            }
+            if (reserve.getChoiceType() == ChoiceType.FLIGHT_OPTION) {
+                FlightOptions flightOptions = flightOptionsRepository.findByUuid(reserve.getChoiceUuid());
+                Flight flight = flightRepository.findByUuid(flightOptions.getFlightUuid());
+                response.setFlightName(flight.getAirlinesNames());
+                response.setFlightOptions(flightOptions);
+            }
+            if (reserve.getChoiceType() == ChoiceType.ACTIVITY) {
+                Activity activity = activityRepository.findByUuid(reserve.getChoiceUuid());
+                activities.add(activity);
+            }
+        }
+        response.setActivityList(activities);
+        return response;
     }
 }
