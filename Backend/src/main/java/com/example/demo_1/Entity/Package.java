@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 @Table(name = "package")
 public class Package {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long uuid;
     String name;
     Long loactionUuid;

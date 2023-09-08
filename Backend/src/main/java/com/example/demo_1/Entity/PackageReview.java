@@ -13,7 +13,7 @@ import lombok.*;
 @Table(name = "package_review")
 public class PackageReview {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long uuid;
     Long customerUuid;
     Long packageUuid;

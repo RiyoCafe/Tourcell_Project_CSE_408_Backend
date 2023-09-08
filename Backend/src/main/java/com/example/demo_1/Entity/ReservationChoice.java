@@ -14,7 +14,7 @@ import lombok.ToString;
 @Table(name = "reservation_choice")
 public class ReservationChoice {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long uuid;
     Long reservationUuid;
     Long choiceUuid;//uuid of hotel_package_options/flight_options/activity

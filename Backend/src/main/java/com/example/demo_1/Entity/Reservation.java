@@ -17,7 +17,7 @@ import java.sql.Timestamp;
 @Table(name = "reservation")
 public class Reservation {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long uuid;
     Long customerUuid;
     Long packageUuid;

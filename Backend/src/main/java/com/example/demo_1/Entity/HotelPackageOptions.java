@@ -16,7 +16,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(name = "hotel_package_options")
 public class HotelPackageOptions {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long uuid;
 
     Long hotelPackageUuid;
