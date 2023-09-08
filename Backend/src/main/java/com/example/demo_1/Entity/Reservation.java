@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.sql.Timestamp;
 
@@ -21,6 +22,9 @@ public class Reservation {
     Long uuid;
     Long customerUuid;
     Long packageUuid;
+    @ColumnDefault("2")
+    @JsonIgnore
+    Long vendorUuid;
     int totalCost;
     @JsonIgnore
     Double reviewRating;
