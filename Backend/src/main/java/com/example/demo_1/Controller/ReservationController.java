@@ -3,6 +3,7 @@ package com.example.demo_1.Controller;
 import com.example.demo_1.Entity.*;
 import com.example.demo_1.Entity.Package;
 import com.example.demo_1.Payload.Request.ReservationRequest;
+import com.example.demo_1.Payload.Response.DetailsResponseOfParticularReservation;
 import com.example.demo_1.Payload.Response.ReservationResponse;
 import com.example.demo_1.Repository.*;
 import com.example.demo_1.Service.ReservationService;
@@ -99,6 +100,12 @@ public class ReservationController {
             reservationResponses.add(reservationService.makeSingleReservationResponse(reservation, reservation.getCustomerUuid()));
         }
         return ResponseEntity.ok(reservationResponses);
+    }
+    @GetMapping("/api/public/details-reservation/{reservationUuid}")
+    public ResponseEntity<?> getDetailsResponseOfReservation(@PathVariable Long reservationUuid)
+    {
+        DetailsResponseOfParticularReservation response = reservationService.makeDetailsReservationResponse(reservationUuid);
+        return ResponseEntity.ok(response);
     }
 
 }
