@@ -245,4 +245,19 @@ public class PackageService {
         }
         return responses;
     }
+
+    public Package toggleAvailableStatus(Long packageUuid) {
+        Package pack = packageRepository.findByUuid(packageUuid);
+        boolean availableFlag = pack.isAvailable();
+        if(availableFlag)   availableFlag = false;
+        else                availableFlag = true;
+        pack.setAvailable(availableFlag);
+        pack = packageRepository.save(pack);
+        return pack;
+    }
+
+    public boolean getAvailaleStatus(Long packageUuid) {
+        Package pack = packageRepository.findByUuid(packageUuid);
+        return pack.isAvailable();
+    }
 }
