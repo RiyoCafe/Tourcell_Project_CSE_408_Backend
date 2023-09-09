@@ -53,7 +53,6 @@ public class PackageService {
         return response;
     }
 
-
     public List<Package> applyPriceFilter(List<Package> packageList, int priceMin, int priceMax)
     {
         List<Package> packages = new ArrayList<>();
@@ -170,7 +169,8 @@ public class PackageService {
         int cnt = searchedLocation.getSearchCnt()+1;
         searchedLocation.setSearchCnt(cnt);
         locationRepository.save(searchedLocation);
-        List<Package> packageList = packageRepository.findAllByLoactionUuidAndStartTimestampAfter(locationUuid,request.getStartTimestamp());
+        //List<Package> packageList = packageRepository.findAllByLoactionUuidAndStartTimestampAfter(locationUuid,request.getStartTimestamp());
+        List<Package> packageList = packageRepository.findAllByLoactionUuidAndAvailableTrue(locationUuid);
 
         if(request.getDurationMax()!=0){
             packageList = applyDurationFilter(packageList,request.getDurationMin(),request.getDurationMax());
@@ -241,6 +241,7 @@ public class PackageService {
         List<PackageDetailsResponse> responses=new ArrayList<>();
         for(Package p: packageList)
         {
+            if(!p.isAvailable())    continue;
             responses.add(getPackageDetailsResponse(p));
         }
         return responses;
