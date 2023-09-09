@@ -128,6 +128,7 @@ public class UserService {
 
         return new JwtResponse(jwt,
                 userDetails.getUuid(),
+                userDetails.getUsername(),
                 userDetails.getEmail(),
                 roles,userDetails.getEmergencyContactNo());
     }

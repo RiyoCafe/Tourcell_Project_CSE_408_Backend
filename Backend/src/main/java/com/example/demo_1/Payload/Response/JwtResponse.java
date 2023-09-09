@@ -15,6 +15,7 @@ import java.util.Set;
 public class JwtResponse {
     String token;
     Long uuid;
+    String userName;
     String email;
     List<String> roles;
     String emergencyContactNo;
