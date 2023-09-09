@@ -21,5 +21,5 @@ public interface PackageRepository extends JpaRepository<Package,Long> {
 
     List<Package> findTop4ByOrderByRatingDesc();
 
-
+    List<Package> findAllByLoactionUuidAndAvailableTrue(Long locationUuid);
 }

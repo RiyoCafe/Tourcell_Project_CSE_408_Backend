@@ -82,6 +82,7 @@ public class PackageController {
         newPackage.setOverview(packageRequest.getDescriptionPackage());
         newPackage.setStartTimestamp(packageRequest.getStartTimestamp());
         newPackage.setVendorUuid(vendorUuid);
+        newPackage.setAvailable(true);
         newPackage.setRatingCnt(0);
         newPackage.setRating(0.0);
         newPackage.setReservationCnt(0);
@@ -140,6 +141,7 @@ public class PackageController {
         List<PackageDetailsResponse> responses=new ArrayList<>();
         List<Package> packageList = repository.findAll();
         for (Package p:packageList){
+            if(!p.isAvailable())    continue;
             PackageDetailsResponse tempResponse = packageService.response(p.getUuid());
             responses.add(tempResponse);
         }
