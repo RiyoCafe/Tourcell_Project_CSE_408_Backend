@@ -2,6 +2,7 @@ package com.example.demo_1.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.sql.Timestamp;
 
@@ -28,6 +29,6 @@ public class Package {
     Long vendorUuid;
     //popular packages
     int reservationCnt;
-
-
+    @ColumnDefault("true")
+    boolean available;
 }

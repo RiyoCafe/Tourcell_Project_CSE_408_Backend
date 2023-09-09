@@ -145,6 +145,20 @@ public class PackageController {
         }
         return ResponseEntity.ok(responses);
     }
+    @PreAuthorize("hasRole('ROLE_VENDOR')")
+    @PatchMapping("/api/vendor/status-change/{packageUuid}")
+    public ResponseEntity<?> toggleAvailabiltyStatus(@PathVariable Long packageUuid)
+    {
+        Package pack = packageService.toggleAvailableStatus(packageUuid);
+        return ResponseEntity.ok(pack);
+    }
+    @GetMapping("/api/public/check-status/{packageUuid}")
+    public ResponseEntity<?> checkAvailableStatus(@PathVariable Long packageUuid)
+    {
+        boolean status = packageService.getAvailaleStatus(packageUuid);
+        if(status)  return ResponseEntity.ok(new MessageResponse("Available"));
+        else        return ResponseEntity.ok(new MessageResponse("Not Available"));
+    }
 
 
 }
