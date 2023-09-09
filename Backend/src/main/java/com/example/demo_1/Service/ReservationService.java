@@ -80,7 +80,7 @@ public class ReservationService {
         response.setPackageName(package_.getName());
         response.setLocationName(location.getCity()+","+location.getCountry());
         response.setDurationDays(package_.getDurationDays());
-        response.setStartTimestamp(package_.getStartTimestamp());
+        response.setStartTimestamp(reservation.getTimestamp());
         response.setVendorName(vendor.getFirstname()+" "+vendor.getLastname());
         response.setTotalCost(reservation.getTotalCost());
         response.setReservationChoices(choiceStrings);
