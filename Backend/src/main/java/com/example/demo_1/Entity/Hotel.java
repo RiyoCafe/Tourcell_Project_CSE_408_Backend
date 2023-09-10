@@ -14,7 +14,7 @@ import lombok.ToString;
 @Table(name = "hotel")
 public class Hotel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long uuid;
     String name;
     int star;

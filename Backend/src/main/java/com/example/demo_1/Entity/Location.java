@@ -14,7 +14,7 @@ import lombok.ToString;
 @Table(name = "location")
 public class Location {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long uuid;
     String city;
     String country;
