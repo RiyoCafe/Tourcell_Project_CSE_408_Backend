@@ -40,7 +40,7 @@ public class PackageService {
                 p.getPrice(),p.getDurationDays(),p.getOverview(),p.getRating(),
                 vendor.getFirstname()+" "+vendor.getLastname(),
                 hotelPackageService.getHotelPackageDetails(package_uuid),
-                flightDetailsService.getFlightDetails(package_uuid),activities);
+                flightDetailsService.getFlightDetails(package_uuid),activities,p.isAvailable());
     }
 
     public PackageDetailsResponse deletePackage(Long packageUuid)
@@ -223,7 +223,7 @@ public class PackageService {
                 p.getPrice(),p.getDurationDays(),p.getOverview(),p.getRating(),
                 vendor.getFirstname()+" "+vendor.getLastname(),
                 hotelPackageService.getHotelPackageDetails(p.getUuid()),
-                flightDetailsService.getFlightDetails(p.getUuid()),activities);
+                flightDetailsService.getFlightDetails(p.getUuid()),activities,p.isAvailable());
     }
 
     public List<PackageDetailsResponse> getPackagesInOrder(String sortBy) {

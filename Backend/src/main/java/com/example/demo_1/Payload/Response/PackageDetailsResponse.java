@@ -28,4 +28,5 @@ public class PackageDetailsResponse {
     //same as flight and activity
     List<FlightDetailsResponse> flightResponses;
     List<Activity> activityResponses;
+    Boolean availability;
 }
